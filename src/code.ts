@@ -781,110 +781,118 @@ async function createChangelogEntryNode(entry: ChangelogEntry): Promise<FrameNod
   descriptionText.lineHeight = { value: 20, unit: 'PIXELS' };
   descriptionText.textAutoResize = 'HEIGHT';
   
-  // Frame para elementos adicionais (imagens, links)
-  const additionalFrame = figma.createFrame();
-  additionalFrame.name = 'additional';
-  additionalFrame.fills = [];
-  additionalFrame.layoutMode = 'VERTICAL';
-  additionalFrame.primaryAxisSizingMode = 'AUTO';
-  additionalFrame.counterAxisSizingMode = 'AUTO';
-  additionalFrame.layoutAlign = 'STRETCH';
-  additionalFrame.itemSpacing = 16;
-  
-  // Se tiver um link, adicionar
-  if (entry.linkUrl && entry.linkLabel) {
-    try {
-      console.log("Tentando adicionar link:", entry.linkUrl);
-      
-      // Verificar se a URL é válida com abordagem simplificada
-      const url = entry.linkUrl.trim();
-      const isHttpUrl = url.startsWith('http://') || url.startsWith('https://');
-      
-      if (isHttpUrl) {
-        console.log("Criando hyperlink com URL válida");
-        
-        // Criar texto com o label do link
-        const linkText = figma.createText();
-        linkText.name = 'link-text';
-        linkText.fontSize = 14;
-        linkText.fontName = availableFonts.regular;
-        linkText.characters = `${entry.linkLabel} ↗`;
-        linkText.fills = [{ type: 'SOLID', color: COLORS.text.link }];
-        
-        // Adicionar hyperlink diretamente, sem tentar validar com URL()
-        linkText.hyperlink = { type: 'URL', value: url };
-        additionalFrame.appendChild(linkText);
-      } else {
-        console.warn("URL inválida não adicionada ao changelog:", entry.linkUrl);
-        const errorText = figma.createText();
-        errorText.name = 'link-error';
-        errorText.fontSize = 12;
-        errorText.fills = [{ type: 'SOLID', color: { r: 0.8, g: 0.2, b: 0.2 } }];
-        errorText.fontName = availableFonts.regular;
-        errorText.characters = "Link não adicionado: URL inválida";
-        additionalFrame.appendChild(errorText);
-      }
-    } catch (error) {
-      console.error("Erro ao criar hyperlink:", error);
-      const errorText = figma.createText();
-      errorText.name = 'link-error';
-      errorText.fontSize = 12;
-      errorText.fills = [{ type: 'SOLID', color: { r: 0.8, g: 0.2, b: 0.2 } }];
-      errorText.fontName = availableFonts.regular;
-      errorText.characters = "Erro ao processar link";
-      additionalFrame.appendChild(errorText);
-    }
-  }
-  
-  // Adicionar imagem caso disponível
-  if (entry.imageData) {
-    try {
-      // Obter base64 da imagem (remover prefixo de data URI)
-      const base64String = entry.imageData.split(',')[1];
-      
-      // Usar a função interna do Figma para decodificar base64
-      const imageBytes = figma.base64Decode(base64String);
-      
-      // Criar imagem com os bytes
-      const figmaImage = figma.createImage(imageBytes);
-      
-      // Criar um retângulo que conterá a imagem
-      const imageFrame = figma.createRectangle();
-      imageFrame.name = 'image';
-      imageFrame.resize(LAYOUT.imageSize.width, LAYOUT.imageSize.height);
-      imageFrame.cornerRadius = 8;
-      
-      // Definir a imagem como preenchimento do retângulo
-      imageFrame.fills = [{
-        type: 'IMAGE',
-        imageHash: figmaImage.hash,
-        scaleMode: 'FILL'
-      }];
-      
-      additionalFrame.appendChild(imageFrame);
-    } catch (error) {
-      console.error('Erro ao processar imagem:', error);
-      
-      // Criar placeholder para a imagem em caso de erro
-      const placeholder = figma.createRectangle();
-      placeholder.name = 'image-placeholder';
-      placeholder.resize(LAYOUT.imageSize.width, LAYOUT.imageSize.height);
-      placeholder.cornerRadius = 8;
-      placeholder.fills = [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9 } }];
-      
-      additionalFrame.appendChild(placeholder);
-    }
-  }
-  
-  // Montar estrutura completa
+  // Montar estrutura inicial
   contentContainer.appendChild(userInfoFrame);
   contentContainer.appendChild(typeFrame);
   contentContainer.appendChild(titleText);
   contentContainer.appendChild(descriptionText);
   
-  // Adicionar elementos adicionais apenas se houver conteúdo
-  if (additionalFrame.children.length > 0) {
-    contentContainer.appendChild(additionalFrame);
+  // Frame para elementos adicionais (imagens, links) - Apenas criar se necessário
+  let additionalFrame: FrameNode | null = null;
+  
+  // Verifica se existem elementos adicionais
+  const hasAdditionalContent = (entry.linkUrl && entry.linkLabel) || entry.imageData;
+  
+  // Apenas cria o frame 'additional' se existir conteúdo adicional
+  if (hasAdditionalContent) {
+    additionalFrame = figma.createFrame();
+    additionalFrame.name = 'additional';
+    additionalFrame.fills = [];
+    additionalFrame.layoutMode = 'VERTICAL';
+    additionalFrame.primaryAxisSizingMode = 'AUTO';
+    additionalFrame.counterAxisSizingMode = 'AUTO';
+    additionalFrame.layoutAlign = 'STRETCH';
+    additionalFrame.itemSpacing = 16;
+    
+    // Se tiver um link, adicionar
+    if (entry.linkUrl && entry.linkLabel) {
+      try {
+        console.log("Tentando adicionar link:", entry.linkUrl);
+        
+        // Verificar se a URL é válida com abordagem simplificada
+        const url = entry.linkUrl.trim();
+        const isHttpUrl = url.startsWith('http://') || url.startsWith('https://');
+        
+        if (isHttpUrl) {
+          console.log("Criando hyperlink com URL válida");
+          
+          // Criar texto com o label do link
+          const linkText = figma.createText();
+          linkText.name = 'link-text';
+          linkText.fontSize = 14;
+          linkText.fontName = availableFonts.regular;
+          linkText.characters = `${entry.linkLabel} ↗`;
+          linkText.fills = [{ type: 'SOLID', color: COLORS.text.link }];
+          
+          // Adicionar hyperlink diretamente, sem tentar validar com URL()
+          linkText.hyperlink = { type: 'URL', value: url };
+          additionalFrame.appendChild(linkText);
+        } else {
+          console.warn("URL inválida não adicionada ao changelog:", entry.linkUrl);
+          const errorText = figma.createText();
+          errorText.name = 'link-error';
+          errorText.fontSize = 12;
+          errorText.fills = [{ type: 'SOLID', color: { r: 0.8, g: 0.2, b: 0.2 } }];
+          errorText.fontName = availableFonts.regular;
+          errorText.characters = "Link não adicionado: URL inválida";
+          additionalFrame.appendChild(errorText);
+        }
+      } catch (error) {
+        console.error("Erro ao criar hyperlink:", error);
+        const errorText = figma.createText();
+        errorText.name = 'link-error';
+        errorText.fontSize = 12;
+        errorText.fills = [{ type: 'SOLID', color: { r: 0.8, g: 0.2, b: 0.2 } }];
+        errorText.fontName = availableFonts.regular;
+        errorText.characters = "Erro ao processar link";
+        additionalFrame.appendChild(errorText);
+      }
+    }
+    
+    // Adicionar imagem caso disponível
+    if (entry.imageData) {
+      try {
+        // Obter base64 da imagem (remover prefixo de data URI)
+        const base64String = entry.imageData.split(',')[1];
+        
+        // Usar a função interna do Figma para decodificar base64
+        const imageBytes = figma.base64Decode(base64String);
+        
+        // Criar imagem com os bytes
+        const figmaImage = figma.createImage(imageBytes);
+        
+        // Criar um retângulo que conterá a imagem
+        const imageFrame = figma.createRectangle();
+        imageFrame.name = 'image';
+        imageFrame.resize(LAYOUT.imageSize.width, LAYOUT.imageSize.height);
+        imageFrame.cornerRadius = 8;
+        
+        // Definir a imagem como preenchimento do retângulo
+        imageFrame.fills = [{
+          type: 'IMAGE',
+          imageHash: figmaImage.hash,
+          scaleMode: 'FILL'
+        }];
+        
+        additionalFrame.appendChild(imageFrame);
+      } catch (error) {
+        console.error('Erro ao processar imagem:', error);
+        
+        // Criar placeholder para a imagem em caso de erro
+        const placeholder = figma.createRectangle();
+        placeholder.name = 'image-placeholder';
+        placeholder.resize(LAYOUT.imageSize.width, LAYOUT.imageSize.height);
+        placeholder.cornerRadius = 8;
+        placeholder.fills = [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9 } }];
+        
+        additionalFrame.appendChild(placeholder);
+      }
+    }
+    
+    // Verificar se durante a criação foi adicionado algum elemento no frame
+    if (additionalFrame.children.length > 0) {
+      contentContainer.appendChild(additionalFrame);
+    }
   }
   
   // Inserir no container principal
