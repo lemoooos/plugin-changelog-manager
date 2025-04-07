@@ -1,72 +1,59 @@
-# Changelog Manager - Plugin para Figma
+# Changelog Manager - Plugin Figma
 
-Um plugin de Figma para criar e gerenciar changelogs diretamente nas páginas do seu projeto.
+Plugin para gerenciamento de changelogs no Figma, permitindo documentar e visualizar alterações em projetos de design.
 
-## Recursos
+## Funcionalidades
 
-- **Criar registros de alterações** organizados dentro do próprio arquivo do Figma
-- **Tipos de alterações predefinidos** (Nova Feature, Bug Fix, Update, etc.)
-- **Captura automática de informações do usuário** (nome e avatar)
-- **Suporte para links** para documentação, protótipos ou outros recursos
-- **Possibilidade de adicionar imagens** para ilustrar as alterações
-- **Organização cronológica** com as alterações mais recentes em primeiro lugar
-
-## Instruções de uso
-
-1. Selecione a página onde deseja adicionar/atualizar o changelog
-2. Execute o plugin "Changelog Manager"
-3. Preencha o formulário com:
-   - Título da alteração (obrigatório)
-   - Descrição da alteração (obrigatório)
-   - Tipo da alteração (obrigatório)
-   - Link e label do link (opcional)
-   - Imagem (opcional)
-4. Clique em "Adicionar alteração"
-5. O plugin criará ou atualizará o frame "Changelog" na página atual
-
-## Estrutura do projeto
-
-- `manifest.json` - Configuração do plugin
-- `ui.html` - Interface do usuário do plugin
-- `src/code.ts` - Código principal do plugin
-- `src/types.d.ts` - Definições de tipos TypeScript
+- Adição de entradas de changelog com título, descrição e tipo de alteração
+- Suporte para upload de imagens
+- Interface intuitiva integrada ao Figma
+- Visualização organizada das alterações
+- Sistema de fallback de fontes para maior compatibilidade
 
 ## Desenvolvimento
 
+Este plugin foi desenvolvido usando:
+- TypeScript
+- HTML/CSS
+- Figma Plugin API
+
 ### Pré-requisitos
 
-- Node.js e npm
+- Node.js
+- npm
+- Figma Desktop App
 
 ### Instalação
 
+1. Clone o repositório
+```bash
+git clone <url-do-repositório>
+```
+
+2. Instale as dependências
 ```bash
 npm install
 ```
 
-### Compilação
-
+3. Compile o projeto
 ```bash
 npm run build
 ```
 
-### Desenvolvimento com compilação contínua
+4. Importe o plugin no Figma Desktop:
+   - Abra o Figma Desktop
+   - Vá para Plugins > Development > Import plugin from manifest
+   - Selecione o arquivo manifest.json do projeto
 
-```bash
-npm run watch
-```
+## Contribuição
 
-## Como carregar o plugin no Figma
+Para contribuir com o projeto:
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
 
-1. No Figma, vá para `Menu > Plugins > Development > New Plugin...`
-2. Clique em "Click to choose a manifest.json file"
-3. Navegue até a pasta deste projeto e selecione o arquivo `manifest.json`
-4. O plugin estará disponível em `Menu > Plugins > Development > Changelog Manager`
+## Licença
 
-## Personalização
-
-Você pode modificar o layout e aparência do Changelog editando as constantes `COLORS` e `LAYOUT` no arquivo `src/code.ts`.
-
-## Limitações
-
-- A API do Figma não permite diretamente o upload de imagens de avatar do usuário, então usamos um placeholder
-- As imagens adicionadas são exibidas como retângulos de placeholder, em uma versão futura podem ser implementadas usando a API de imagens do Figma 
+Este projeto está sob a licença MIT. 
