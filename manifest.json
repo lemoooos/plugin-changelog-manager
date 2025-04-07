@@ -1,0 +1,15 @@
+{
+  "name": "Changelog Manager ◦ Inter UX",
+  "id": "changelog-manager",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "permissions": ["currentuser"],
+  "menu": [
+    {
+      "name": "Adicionar Alteração",
+      "command": "addChange"
+    }
+  ]
+} 

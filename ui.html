@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAAmVBMVEXu2zH////07pXy5V7x5FP69s3x5E/58bb69sr48KX585P69sf27IO7iADfxCBsSwCsz7mCXwD58rz+/fjBkgBiRAB6sCa2ggCarFK71sWRpUKFYgB2VAB4VgCQbgCDYABqSQBlRgBxTwCxfQCuj02dawCjdzKBpjqdsGKKqEB9WQB+oTGLeAKwz7vy5mvM3sXi7NiozrXJ2cFosBb4AAAE/ElEQVR4Ae3abW+bSBQF4MMuYDZZ7Y7xXFhgbMAGmwax+/9/3AV6MXGyqVQpd0S+R/mCHM4biDcEQRAEQRAEQRAEQRAEQRAEQRAEQfAn4rXV6wD8CuBPtQoYA67U1Qs/Ue/0AugnILr9BAA9B6S1xkvxDkTXNZYDfQNqXmEpNtDTR7MiwfXMCrzPJy2BHgPxEtdFqQ92OjxXoHVNm2vFHUw0wQU5EHPc3DPNp59gbGHEdPY13GxNL3iF2wTuGf46WKXX/DvCL3mLn2roVN2FY9zmx3r64mJwhZPUuM0UitSvDpUOhz2OmY9xozbP1FRHcw3sNY6YfFyl0XPaUFxg4xrj9i5e70jRH4DkI0ZDaqnRjFe1fgbsUkYNnT6Nw1G5AY5O8bVoPL0bXqgL1OFTVvFtMeRdtdP46Y9Vqc6BLW3wnRnxOXLCCTVxMQP2sEJEBY62k1t8M5LKOzaLfwJ7oqiJ9P7I1Dgu+OEXnAeF8wMYu3WC0wQf3k5UQCm4Mc7DPRMVFkNn3tMcJzE9eGjXOVCw9XAWK/GNfyf0Hue0+MyPkgpnso6BdxVOI2eDqFfW81LlYKEk29tHnC25YgN0D70uoQrCLYLaF+f9Ytt1P6tFvlvU0dS+D7SWmYYK0bRY7X74nEX5Q1yvsj70S5+1wj7CUuxQRyZvnEfzL7vxwL8fSrYDWkOxHaKtYa6BIgv/1rZaT/afDhJf9H5f5VEPAFZqL1tPZ9Hcm4CZnrbTaD9r3gNqFJ+iyOGqP8SBMoNfJbY/NrIf1Kv+sKP4X+DKgUAWNr8vYHqG61+A9hn7Aof3E/z2CZjlUXsFtClvPUDr5ZG38C83A9pEjz6F+/fPvxc/HBQI9MHWI2BrpfaAhYfZJgK23rJF9AtKvQBU6R08i1gBaK2kAhYJNloiKi2cTDLTdoAq05bQaSNl2wNqXNQATJbUekE6B1QKKUAJaVFXbwvIRhUwFaVR1wLKsRbAZOVajcBx1GYRsDm5WAvAHi0V0BLCRk4xWVZAluQsA4KKDJBFucSQ8UySJsYC0NqY9bCJKKvRoLZNkQF0FpUWkCl5ZIpHtKbr0RpQKlIZ0lsZJVMNqLSQLXa6vwXmFNWKsR7QScFKG0Bn+h4fCOOVitZ2XDFa9lWKxQQPwZ66WNr9eCtjRNR1sVt4gq5sI3MDCL6LkuVNI/gBQm81UgTY0kOx6lUW6z2gSpV2QKXM6rWbjjMKPB2+8XXvaXPbVJVDd9EAxS5BmwxIsRhwbCBNl6Nt7Vb9wIAwU7/ZtUYfBFe+KZBYmY7E/kKLZAGouHHvNtl26wHQq0lZTBUQn97fPD10iS5k0wOBn/dHRyeBnv4lofhV30uFqRt6ZbvdJJ40kGaRBnSkkkbmvEkCJOw4a0TLn6W9OLxtOx0BWvWJjnQIzPE5MUAvXOv3qfZwGgdE05qeAvZz/DfOFw3/P8EKv/PU84Hc/jR+E97Z5x8PgXH3TdnjexyxpdFNW8D1X8Y2Yppt0gA1PTbD/7GjaQPU1dLfNJ+9neMX/cDcHbDgT+EL5pnb0V8D3yN/2XwmX5pvAf1y6DUyBEEQBEEQBEEQBEEQBEEQBEEQ/AUgPqZ5mOB/uwAAAABJRU5ErkJggg==">
+  <style>
+    :root {
+      --color-primary: #F9F9F9;
+      --color-secondary: #625A59;
+      --color-tertiary: #787878;
+      --color-text: #333333;
+      --color-hint: #929292;
+      --color-border: #444444;
+      --color-accent: #DE710C;
+      --color-button: #DE710C;
+      --color-button-hover: #c76407;
+      --color-background: #292929;
+      --color-input-bg: #1E1E1E;
+      --color-error: #DC2626;
+      --border-radius: 6px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: var(--color-text);
+      background-color: var(--color-background);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    ::placeholder {
+      color: var(--color-tertiary)
+    }
+    
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: var(--spacing-md);
+      color: var(--color-primary);
+    }
+    
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--color-primary);
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      font-family: inherit;
+      background-color: var(--color-input-bg);
+      transition: border-color 0.2s ease;
+      color: var(--color-primary);
+    }
+
+    select.minimal {
+      margin: 0;      
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      background-image:
+        linear-gradient(45deg, transparent 50%, gray 50%),
+        linear-gradient(135deg, gray 50%, transparent 50%),
+        linear-gradient(to right, #1e1e1e, #1e1e1e);
+      background-position:
+        calc(100% - 20px) calc(1em + 2px),
+        calc(100% - 15px) calc(1em + 2px),
+        calc(100% - 2.5em) 0.5em;
+      background-size:
+        5px 5px,
+        5px 5px,
+        1px 1.5em;
+      background-repeat: no-repeat;
+    }
+
+    select {
+      color: var(--color-primary)
+    }
+    option:not(:first-of-type) {
+      color: black;
+    }
+    /* the modification */
+    option:first-of-type {
+      display: none;
+    }
+
+    select:-moz-focusring {
+      color: transparent;
+      text-shadow: 0 0 0 #000;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--color-button);
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    button {
+      background: var(--color-button);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 10px 20px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: var(--spacing-md);
+      transition: background-color 0.2s ease;
+    }
+    
+    button:hover {
+      background: var(--color-button-hover);
+    }
+    
+    .required::after {
+      content: " *";
+      color: var(--color-error);
+    }
+    
+    .optional {
+      color: var(--color-hint);
+      font-weight: normal;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+    
+    .image-preview {
+      max-width: 100%;
+      max-height: 150px;
+      margin-top: var(--spacing-sm);
+      display: none;
+      border-radius: var(--border-radius);
+      object-fit: cover;
+    }
+    
+    .file-input-container {
+      position: relative;
+      margin-top: var(--spacing-sm);
+    }
+    
+    .file-input-label {
+      display: inline-block;
+      background: var(--color-background);
+      padding: 8px 16px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 14px;
+      border: 1px solid var(--color-tertiary);
+      color: var(--color-text);
+      transition: background-color 0.2s ease;
+
+      border: 1px;
+      border-style: dashed;
+      border-color: var(--color-secondary);
+      width: 100%;
+      text-align: center;
+      height: 120px;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+    
+    .file-input-label:hover {
+      /* background: #EFEFEF; */
+    }
+    
+    #imageFile {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .file-name {
+      font-size: 12px;
+      margin-top: 6px;
+      color: var(--color-secondary);
+    }
+    
+    .success-message {
+      background-color: #F0FCF2;
+      color: #157B40;
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      margin-bottom: var(--spacing-md);
+      display: none;
+    }
+    
+    .error-message {
+      background-color: #FEE2E2;
+      color: var(--color-error);
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      margin-bottom: var(--spacing-md);
+      display: none;
+    }
+    
+    /* Estilos para os tipos de mudança */
+    .change-type-item {
+      padding: 4px 8px;
+      margin-right: 4px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .badge-new-feature {
+      background: #F0FCF2;
+      color: #157B40;
+    }
+    
+    .badge-update {
+      background: #EEF6FF;
+      color: #107ABF;
+    }
+    
+    .badge-bug-fix {
+      background: #FFF7E8;
+      color: #CC871F;
+    }
+    
+    .badge-removed {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+    
+    .badge-refactoring {
+      background: #F4F0FF;
+      color: #754CD6;
+    }
+    
+    .badge-improvement {
+      background: #E8F8FC;
+      color: #2693BA;
+    }
+    
+    .badge-deprecation {
+      background: #FFE6F0;
+      color: #BF305E;
+    }
+    
+    .badge-layout-adjustment {
+      background: #F0F0F0;
+      color: #666666;
+    }
+    
+    .image-size-hint {
+      color: var(--color-hint);
+      font-size: 12px;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <!-- <h1>Adicionar alteração ao Changelog</h1> -->
+  
+  <div id="successMessage" class="success-message">
+    Alteração adicionada com sucesso!
+  </div>
+  
+  <div id="errorMessage" class="error-message">
+    Erro ao adicionar alteração. Tente novamente.
+  </div>
+  
+  <form id="changelogForm">
+
+    <div class="form-group">
+      <label class="required" for="changeType">Classifique sua alteração</label>
+      <select id="changeType" class="minimal" name="changeType">
+        <option value="">Selecione o tipo da alteração</option>
+        <option value="New Feature">Nova Feature</option>
+        <option value="Update">Update</option>
+        <option value="Bug Fix">Bug Fix</option>
+        <option value="Removed">Removido</option>
+        <option value="Refactoring">Refatoração</option>
+        <option value="Improvement">Melhoria</option>
+        <option value="Deprecation">Depreciação</option>
+        <option value="Layout Adjustment">Ajuste de Layout</option>
+      </select>
+    </div>
+
+
+    <div class="form-group">
+      <label class="required" for="title">Título</label>
+      <input type="text" id="title" name="title" placeholder="Informe um título descritivo para alteração">
+    </div>
+    
+    <div class="form-group">
+      <label class="required" for="description">Descrição</label>
+      <textarea id="description" name="description" placeholder="Descreva em detalhes o que foi alterado"></textarea>
+    </div>
+    
+    
+    <div class="form-group">
+      <label for="linkLabel">Label do link <span class="optional">(opcional)</span></label>
+      <input type="text" id="linkLabel" name="linkLabel" placeholder="Texto do link (ex: Protótipo)">
+    </div>
+
+    <div class="form-group">
+      <label for="linkUrl">Endereço do link <span class="optional">(opcional)</span></label>
+      <input type="text" id="linkUrl" name="linkUrl" placeholder="http:// ou https://">
+    </div>
+    
+    <div class="form-group">
+      <label for="imageFile">Imagem <span class="optional">(opcional)</span></label>
+      <div class="file-input-container" id="fileInputContainer">
+        <label class="file-input-label">
+         Envie uma imagem do seu computador
+         <div class="image-size-hint">Tamanho recomendado de 600px × 330px</div>
+          <input type="file" id="imageFile" accept="image/*">
+        </label>
+        <div class="file-name" id="fileName"></div>
+      </div>
+      <img id="imagePreview" class="image-preview">
+      <button type="button" id="removeImageBtn" style="display: none; margin-top: 10px; background-color: #DC2626; width: auto; padding: 8px 16px;">Remover imagem</button>
+    </div>
+    
+    <button type="submit" id="submitBtn">Adicionar alteração</button>
+  </form>
+
+  <script>
+    // Preview da imagem selecionada
+    document.getElementById('imageFile').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('imagePreview');
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          document.getElementById('fileName').textContent = file.name;
+          
+          // Ocultar o botão de escolher imagem e mostrar o botão de remover
+          document.getElementById('fileInputContainer').style.display = 'none';
+          document.getElementById('removeImageBtn').style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Adicionar evento para o botão remover imagem
+    document.getElementById('removeImageBtn').addEventListener('click', function() {
+      // Limpar a imagem
+      document.getElementById('imageFile').value = '';
+      document.getElementById('imagePreview').src = '';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('fileName').textContent = '';
+      
+      // Ocultar o botão de remover e mostrar o de escolher imagem novamente
+      this.style.display = 'none';
+      document.getElementById('fileInputContainer').style.display = 'block';
+    });
+
+    // Função para mostrar erro de validação
+    function showValidationError(inputElement, message) {
+      const errorElement = document.createElement('div');
+      errorElement.className = 'validation-error';
+      errorElement.textContent = message;
+      errorElement.style.color = '#e11d48';
+      errorElement.style.fontSize = '12px';
+      errorElement.style.marginTop = '4px';
+      errorElement.style.marginBottom = '8px';
+      
+      // Inserir após o elemento
+      inputElement.parentNode.insertBefore(errorElement, inputElement.nextSibling);
+      
+      // Destacar o campo com erro
+      inputElement.style.borderColor = '#e11d48';
+      
+      // Remover destaque quando o usuário começar a digitar novamente
+      inputElement.addEventListener('input', function() {
+        inputElement.style.borderColor = '';
+        const error = inputElement.nextSibling;
+        if (error && error.className === 'validation-error') {
+          error.remove();
+        }
+      }, { once: true });
+    }
+
+    // Função para validar URL
+    function isValidUrl(string) {
+      try {
+        if (!string || string.trim() === '') return true; // URL vazia é considerada válida (opcional)
+        
+        // Se não começar com http:// ou https://, é inválida
+        if (!string.startsWith('http://') && !string.startsWith('https://')) {
+          return false;
+        }
+        
+        const url = new URL(string);
+        // Verificar se tem protocolo válido
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // Implementação da função processUserPhoto
+    function processUserPhoto(callback) {
+      // Inicialmente enviar para o plugin pedindo informações do usuário
+      parent.postMessage({ pluginMessage: { type: 'get-user-info' } }, '*');
+      
+      // Variável para armazenar o callback e usar quando a resposta chegar
+      window.currentImageCallback = callback;
+      
+      // Se depois de 3 segundos não tivermos resposta, resolva com null
+      setTimeout(() => {
+        if (window.currentImageCallback) {
+          console.log('Tempo esgotado ao esperar pela foto do usuário, continuando sem ela');
+          const cb = window.currentImageCallback;
+          delete window.currentImageCallback;
+          cb(null);
+        }
+      }, 3000);
+    }
+
+    // Formulário de envio
+    document.getElementById('changelogForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = this;
+      
+      // Limpar mensagens de erro anteriores
+      document.querySelectorAll('.validation-error').forEach(el => el.remove());
+      
+      // Pegar valores do formulário
+      const title = form.title.value;
+      const description = form.description.value;
+      const changeType = form.changeType.value;
+      const linkUrl = form.linkUrl.value;
+      const linkLabel = form.linkLabel.value;
+      const imagePreview = document.getElementById('imagePreview');
+      const imageFile = document.getElementById('imageFile').files[0];
+      
+      // Validações básicas
+      let hasError = false;
+      
+      if (!title.trim()) {
+        showValidationError(form.title, 'Título é obrigatório');
+        hasError = true;
+      }
+      
+      if (!description.trim()) {
+        showValidationError(form.description, 'Descrição é obrigatória');
+        hasError = true;
+      }
+      
+      if (!changeType) {
+        showValidationError(form.changeType, 'Selecione o tipo de alteração');
+        hasError = true;
+      }
+      
+      // Validar URL se foi preenchida
+      if (linkUrl.trim() && !isValidUrl(linkUrl)) {
+        showValidationError(form.linkUrl, 'URL inválida. O link deve começar com http:// ou https://');
+        hasError = true;
+      }
+      
+      // Validar que se tem URL precisa ter label e vice-versa
+      if (linkUrl.trim() && !linkLabel.trim()) {
+        showValidationError(form.linkLabel, 'Preencha o texto do link');
+        hasError = true;
+      }
+      
+      if (linkLabel.trim() && !linkUrl.trim()) {
+        showValidationError(form.linkUrl, 'Preencha a URL do link');
+        hasError = true;
+      }
+      
+      if (hasError) {
+        return;
+      }
+      
+      // Limpar mensagem de erro geral
+      document.getElementById('errorMessage').textContent = '';
+      document.getElementById('errorMessage').style.display = 'none';
+
+      // Desabilitar botão para prevenir cliques múltiplos
+      const submitBtn = document.getElementById('submitBtn');
+      const originalBtnText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      // Dados iniciais do formulário
+      const data = {
+        title: title,
+        description: description,
+        changeType: changeType,
+        linkUrl: linkUrl,
+        linkLabel: linkLabel,
+        imageData: imagePreview.style.display !== 'none' ? imagePreview.src : null,
+        userPhotoData: null // Será preenchido pela função processUserPhoto
+      };
+
+      try {
+        // Processar a foto do usuário para base64
+        await new Promise((resolve) => {
+          processUserPhoto(function(userPhotoBase64) {
+            data.userPhotoData = userPhotoBase64;
+            resolve();
+          });
+        });
+        
+        // Enviar dados para o plugin
+        parent.postMessage({ 
+          pluginMessage: { 
+            type: 'submit-form', 
+            data: data 
+          } 
+        }, '*');
+      } catch (error) {
+        console.error('Erro ao processar dados:', error);
+        document.getElementById('errorMessage').textContent = 'Erro ao processar dados: ' + error.message;
+        document.getElementById('errorMessage').style.display = 'block';
+        
+        // Restaurar botão
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+    });
+
+    // Receber mensagens do código principal
+    window.onmessage = (event) => {
+      const message = event.data.pluginMessage;
+      if (message) {
+        console.log("Mensagem recebida do plugin:", message.type);
+        
+        // Processar resposta com informações do usuário
+        if (message.type === 'user-info') {
+          console.log('Recebidas informações do usuário');
+          if (message.photoUrl) {
+            // Se temos uma URL de foto, tente processá-la
+            parent.postMessage({ 
+              pluginMessage: { 
+                type: 'process-user-image', 
+                photoUrl: message.photoUrl 
+              } 
+            }, '*');
+          } else if (window.currentImageCallback) {
+            // Se não temos URL, responda o callback com null
+            window.currentImageCallback(null);
+            delete window.currentImageCallback;
+          }
+        }
+        
+        // Lidar com bytes da imagem que o plugin processou
+        else if (message.type === 'user-image-bytes') {
+          try {
+            console.log('Recebidos bytes de imagem do plugin, convertendo para base64');
+            // Converter array de bytes para Uint8Array
+            const imageBytes = new Uint8Array(message.imageBytes);
+            
+            // Criar um Blob a partir dos bytes
+            const blob = new Blob([imageBytes], { type: `image/${message.format.toLowerCase()}` });
+            
+            // Converter Blob para base64
+            const reader = new FileReader();
+            reader.onload = function() {
+              const base64data = reader.result;
+              console.log('Bytes de imagem convertidos para base64 com sucesso');
+              
+              // Se isso estiver em um processamento pendente, continuar
+              if (window.currentImageCallback) {
+                window.currentImageCallback(base64data);
+                delete window.currentImageCallback;
+              }
+            };
+            
+            reader.onerror = function(error) {
+              console.error('Erro ao converter bytes para base64:', error);
+              if (window.currentImageCallback) {
+                window.currentImageCallback(null);
+                delete window.currentImageCallback;
+              }
+            };
+            
+            reader.readAsDataURL(blob);
+          } catch (error) {
+            console.error('Erro ao processar bytes da imagem:', error);
+            if (window.currentImageCallback) {
+              window.currentImageCallback(null);
+              delete window.currentImageCallback;
+            }
+          }
+        }
+        
+        // Responder diretamente com imagem processada
+        else if (message.type === 'user-image-processed' && window.currentImageCallback) {
+          console.log('Recebida imagem já processada do plugin');
+          window.currentImageCallback(message.imageData);
+          delete window.currentImageCallback;
+        }
+        
+        // Erro no processamento da imagem
+        else if (message.type === 'user-image-error' && window.currentImageCallback) {
+          console.error('Erro no processamento da imagem:', message.error);
+          window.currentImageCallback(null);
+          delete window.currentImageCallback;
+        }
+        
+        // Restaurar o botão para o estado normal
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.textContent = 'Adicionar alteração';
+        submitBtn.disabled = false;
+        
+        if (message.type === 'success') {
+          document.getElementById('successMessage').style.display = 'block';
+          
+          // Limpar formulário após submissão bem-sucedida
+          document.getElementById('title').value = '';
+          document.getElementById('description').value = '';
+          document.getElementById('changeType').value = '';
+          document.getElementById('linkUrl').value = '';
+          document.getElementById('linkLabel').value = '';
+          document.getElementById('imageFile').value = '';
+          document.getElementById('imagePreview').style.display = 'none';
+          document.getElementById('fileName').textContent = '';
+          
+          // Esconder a mensagem de sucesso após 3 segundos
+          setTimeout(() => {
+            document.getElementById('successMessage').style.display = 'none';
+          }, 3000);
+        } else if (message.type === 'error') {
+          document.getElementById('errorMessage').textContent = message.message || 'Ocorreu um erro ao processar sua solicitação.';
+          document.getElementById('errorMessage').style.display = 'block';
+        }
+      }
+    };
+  </script>
+</body>
+</html> 
