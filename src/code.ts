@@ -28,6 +28,8 @@ interface FormData {
 interface UIMessage {
   type: string;
   data?: FormData;
+  pageId?: string;
+  photoUrl?: string;
 }
 
 // Cores utilizadas no Changelog (baseado no design Figma)
@@ -186,18 +188,296 @@ async function loadFontsWithFallback(): Promise<FontCollection> {
   return loadedFonts;
 }
 
+// Função para verificar se existe um changelog em uma página
+function hasChangelog(page: PageNode): { exists: boolean, frame?: FrameNode, count?: number } {
+  try {
+    console.log(`Verificando changelog na página: ${page.name}`);
+    
+    // Procurar por um frame de Changelog na página
+    const nodes = page.children;
+    console.log(`A página tem ${nodes.length} nós filhos`);
+    
+    const changelogFrame = nodes.find(node => 
+      node.type === 'FRAME' && node.name === LAYOUT.containerName
+    ) as FrameNode | undefined;
+    
+    if (!changelogFrame) {
+      console.log('Nenhum frame de changelog encontrado');
+      return { exists: false };
+    }
+    
+    console.log(`Frame de changelog encontrado: ${changelogFrame.name}`);
+    
+    // Procurar pelo container de conteúdo
+    const contentFrames = changelogFrame.children.filter(node => 
+      node.type === 'FRAME' && node.name === 'content'
+    );
+    
+    if (contentFrames.length === 0) {
+      console.log('Container de conteúdo não encontrado');
+      return { exists: true, frame: changelogFrame, count: 0 };
+    }
+    
+    const contentContainer = contentFrames[0] as FrameNode;
+    console.log(`Container de conteúdo encontrado com ${contentContainer.children.length} itens`);
+    
+    // Contar entradas no changelog
+    const entryCount = contentContainer.children.length;
+    
+    return { 
+      exists: true, 
+      frame: changelogFrame,
+      count: entryCount
+    };
+  } catch (error) {
+    console.error('Erro ao verificar changelog:', error);
+    return { exists: false };
+  }
+}
+
+// Função para navegar até um frame específico
+async function navigateToFrame(frame: FrameNode) {
+  try {
+    console.log(`Navegando para o frame: ${frame.name}`);
+    // Verificar se o frame pertence à página atual
+    if (frame.parent?.type === 'PAGE') {
+      const framePage = frame.parent as PageNode;
+      if (framePage.id !== figma.currentPage.id) {
+        console.log(`O frame está na página ${framePage.name}, que não é a página atual. Alterando para esta página...`);
+        await figma.setCurrentPageAsync(framePage);
+      }
+    }
+    
+    // Zoom para mostrar o frame inteiro
+    figma.viewport.scrollAndZoomIntoView([frame]);
+    console.log('Navegação concluída com sucesso');
+  } catch (error) {
+    console.error(`Erro ao navegar para o frame: ${error}`);
+    figma.ui.postMessage({ type: 'error', message: `Erro ao navegar: ${error}` });
+  }
+}
+
+// Função para habilitar uma página selecionada
+async function selectPage(pageId: string): Promise<PageNode | null> {
+  try {
+    const pages = figma.root.children;
+    console.log(`Buscando página com ID: ${pageId} entre ${pages.length} páginas`);
+    const page = pages.find(p => p.id === pageId) as PageNode | undefined;
+    
+    if (page) {
+      // Alternar para a página selecionada usando o método assíncrono
+      console.log(`Página encontrada: ${page.name}, alterando para esta página...`);
+      await figma.setCurrentPageAsync(page);
+      return page;
+    } else {
+      console.log(`Página com ID ${pageId} não encontrada`);
+    }
+    
+    return null;
+  } catch (error) {
+    console.error(`Erro ao selecionar página: ${error}`);
+    figma.ui.postMessage({ type: 'error', message: `Erro ao selecionar página: ${error}` });
+    return null;
+  }
+}
+
 // Inicialização do plugin
 figma.showUI(__html__, { width: 450, height: 550 });
 
 // Função para lidar com mensagens da UI
-figma.ui.onmessage = async (msg) => {
+figma.ui.onmessage = async (msg: UIMessage) => {
   console.log(`Plugin recebeu mensagem do tipo: ${msg.type}`);
 
-  if (msg.type === 'create-changelog') {
-    // ... existing code ...
+  if (msg.type === 'get-pages') {
+    try {
+      // Obter as páginas diretamente do figma.root.children
+      const pageNodes = figma.root.children;
+      console.log(`Encontradas ${pageNodes.length} páginas no documento`);
+      
+      const pages = pageNodes.map(page => {
+        console.log(`Processando página: ${page.name} (id: ${page.id})`);
+        return {
+          id: page.id,
+          name: page.name
+        };
+      });
+      
+      console.log('Enviando páginas para a UI:', pages);
+      figma.ui.postMessage({ 
+        type: 'update-pages', 
+        pages: pages 
+      });
+    } catch (error) {
+      console.error('Erro ao obter páginas:', error);
+      figma.ui.postMessage({ type: 'error', message: 'Não foi possível carregar as páginas do projeto.' });
+    }
+  }
+  else if (msg.type === 'check-changelog') {
+    // Verificar se a página selecionada tem changelog
+    if (msg.pageId) {
+      try {
+        console.log(`Verificando changelog na página com ID: ${msg.pageId}`);
+        
+        // Alternar para a página selecionada
+        const page = await selectPage(msg.pageId);
+        
+        if (page) {
+          console.log(`Página selecionada: ${page.name}, verificando changelog...`);
+          // Verificar se a página tem changelog
+          const result = hasChangelog(page);
+          
+          console.log(`Resultado da verificação: existe=${result.exists}, count=${result.count || 0}`);
+          figma.ui.postMessage({ 
+            type: 'changelog-status', 
+            hasChangelog: result.exists,
+            entryCount: result.count || 0,
+            currentPageId: page.id
+          });
+        } else {
+          console.error('Página não encontrada:', msg.pageId);
+          figma.ui.postMessage({ type: 'error', message: 'Página selecionada não encontrada.' });
+        }
+      } catch (error) {
+        console.error('Erro ao verificar changelog:', error);
+        figma.ui.postMessage({ type: 'error', message: 'Não foi possível verificar o changelog na página selecionada.' });
+      }
+    }
+  }
+  else if (msg.type === 'navigate-to-changelog') {
+    // Navegar até o frame do changelog
+    try {
+      console.log('Solicitação para navegar até o changelog');
+      const page = figma.currentPage;
+      const result = hasChangelog(page);
+      
+      if (result.exists && result.frame) {
+        console.log(`Changelog encontrado, navegando para o frame...`);
+        await navigateToFrame(result.frame);
+      } else {
+        console.log('Nenhum changelog encontrado nesta página');
+        figma.notify('Nenhum changelog encontrado nesta página');
+      }
+    } catch (error) {
+      console.error('Erro ao navegar para o changelog:', error);
+      figma.ui.postMessage({ type: 'error', message: 'Não foi possível navegar até o changelog.' });
+    }
+  }
+  else if (msg.type === 'create-changelog') {
+    try {
+      // Verificar se temos os dados necessários
+      if (!msg.data) {
+        throw new Error('Dados do formulário não fornecidos');
+      }
+
+      // Obter dados do usuário atual
+      const user = {
+        name: figma.currentUser?.name || 'Usuário Desconhecido',
+        photoUrl: msg.data.userPhotoData || figma.currentUser?.photoUrl || ''
+      };
+
+      // Criar uma nova entrada para o changelog
+      const newEntry: ChangelogEntry = {
+        id: generateUniqueId(),
+        title: msg.data.title,
+        description: msg.data.description,
+        changeType: msg.data.changeType,
+        linkUrl: msg.data.linkUrl,
+        linkLabel: msg.data.linkLabel,
+        imageData: msg.data.imageData,
+        user,
+        timestamp: Date.now()
+      };
+
+      // Encontrar ou criar o frame do Changelog
+      await updateChangelogFrame(newEntry);
+
+      // Verificar o novo número de entradas
+      const updatedResult = hasChangelog(figma.currentPage);
+      
+      // Notificar a UI de sucesso e atualizar a contagem de entradas
+      figma.ui.postMessage({ 
+        type: 'success', 
+        hasChangelog: true, 
+        entryCount: updatedResult.count || 0,
+        currentPageId: figma.currentPage.id
+      });
+      
+      // Voltar para a página inicial após o sucesso
+      setTimeout(() => {
+        figma.ui.postMessage({ 
+          type: 'navigate-to-home',
+          hasChangelog: true,
+          entryCount: updatedResult.count || 0,
+          currentPageId: figma.currentPage.id 
+        });
+      }, 1500);
+    } catch (error: any) {
+      console.error('Erro ao criar changelog:', error);
+      figma.notify(`Erro ao criar o changelog: ${error}`, { error: true });
+      figma.ui.postMessage({ type: 'error', message: `Erro ao criar o changelog: ${error}` });
+    }
   } 
   else if (msg.type === 'add-changelog-entry') {
-    // ... existing code ...
+    try {
+      // Verificar se temos os dados necessários
+      if (!msg.data) {
+        throw new Error('Dados do formulário não fornecidos');
+      }
+
+      // Verificar se existe um changelog na página atual
+      const result = hasChangelog(figma.currentPage);
+      
+      if (!result.exists) {
+        throw new Error('Nenhum changelog encontrado na página atual');
+      }
+
+      // Obter dados do usuário atual
+      const user = {
+        name: figma.currentUser?.name || 'Usuário Desconhecido',
+        photoUrl: msg.data.userPhotoData || figma.currentUser?.photoUrl || ''
+      };
+
+      // Criar uma nova entrada para o changelog
+      const newEntry: ChangelogEntry = {
+        id: generateUniqueId(),
+        title: msg.data.title,
+        description: msg.data.description,
+        changeType: msg.data.changeType,
+        linkUrl: msg.data.linkUrl,
+        linkLabel: msg.data.linkLabel,
+        imageData: msg.data.imageData,
+        user,
+        timestamp: Date.now()
+      };
+
+      // Adicionar a entrada ao changelog existente
+      await updateChangelogFrame(newEntry);
+
+      // Verificar o novo número de entradas
+      const updatedResult = hasChangelog(figma.currentPage);
+      
+      // Notificar a UI de sucesso e atualizar a contagem de entradas
+      figma.ui.postMessage({ 
+        type: 'success', 
+        hasChangelog: true, 
+        entryCount: updatedResult.count || 0,
+        currentPageId: figma.currentPage.id
+      });
+      
+      // Voltar para a página inicial após o sucesso
+      setTimeout(() => {
+        figma.ui.postMessage({ 
+          type: 'navigate-to-home',
+          hasChangelog: true,
+          entryCount: updatedResult.count || 0,
+          currentPageId: figma.currentPage.id 
+        });
+      }, 1500);
+    } catch (error: any) {
+      console.error('Erro ao adicionar entrada ao changelog:', error);
+      figma.notify(`Erro ao adicionar entrada: ${error}`, { error: true });
+      figma.ui.postMessage({ type: 'error', message: `Erro ao adicionar entrada: ${error}` });
+    }
   }
   else if (msg.type === 'get-user-info') {
     // Enviar informações do usuário atual para a UI
@@ -217,6 +497,16 @@ figma.ui.onmessage = async (msg) => {
     
     try {
       const photoUrl = msg.photoUrl;
+      
+      // Verificar se photoUrl existe
+      if (!photoUrl) {
+        console.error('URL da foto não foi fornecida');
+        figma.ui.postMessage({ 
+          type: 'user-image-error', 
+          error: 'URL da foto não foi fornecida'
+        });
+        return;
+      }
       
       // Verificar se já é um base64
       if (photoUrl.startsWith('data:image/')) {

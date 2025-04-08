@@ -286,76 +286,555 @@
       margin-bottom: 8px;
       font-style: italic;
     }
+    
+    /* Estilos para navegação entre páginas */
+    .page {
+        display: none;
+    }
+    
+    .page.active {
+        display: block;
+    }
+    
+    .page-selector {
+        width: 100%;
+        padding: 16px;
+        background-color: var(--color-background);
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .page-selector select {
+        width: 100%;
+        height: 40px;
+        padding: 8px 12px;
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: var(--color-primary);
+        background-color: var(--color-input-bg);
+        background-image:
+          linear-gradient(45deg, transparent 50%, var(--color-tertiary) 50%),
+          linear-gradient(135deg, var(--color-tertiary) 50%, transparent 50%);
+        background-position:
+          calc(100% - 20px) calc(1em + 2px),
+          calc(100% - 15px) calc(1em + 2px);
+        background-size:
+          5px 5px,
+          5px 5px;
+        background-repeat: no-repeat;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    
+    .page-info {
+        margin-top: 16px;
+        padding: 16px;
+        text-align: center;
+    }
+    
+    .page-info h3 {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+    }
+    
+    .page-info p {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: var(--color-secondary);
+        margin-bottom: 16px;
+    }
+    
+    .button-container {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .button-container button {
+        min-width: 120px;
+    }
+    
+    /* Estilo para estado de carregamento */
+    .loading {
+        position: relative;
+        pointer-events: none;
+    }
+    
+    .loading::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.2);
+        border-radius: var(--border-radius);
+        backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--color-button);
+        border-radius: 50%;
+        border-top-color: transparent;
+        margin: 20px auto;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <!-- <h1>Adicionar alteração ao Changelog</h1> -->
-  
-  <div id="successMessage" class="success-message">
-    Alteração adicionada com sucesso!
-  </div>
-  
-  <div id="errorMessage" class="error-message">
-    Erro ao adicionar alteração. Tente novamente.
-  </div>
-  
-  <form id="changelogForm">
-
-    <div class="form-group">
-      <label class="required" for="changeType">Classifique sua alteração</label>
-      <select id="changeType" class="minimal" name="changeType">
-        <option value="">Selecione o tipo da alteração</option>
-        <option value="New Feature">Nova Feature</option>
-        <option value="Update">Update</option>
-        <option value="Bug Fix">Bug Fix</option>
-        <option value="Removed">Removido</option>
-        <option value="Refactoring">Refatoração</option>
-        <option value="Improvement">Melhoria</option>
-        <option value="Deprecation">Depreciação</option>
-        <option value="Layout Adjustment">Ajuste de Layout</option>
+  <!-- Página inicial com seletor de páginas -->
+  <div id="home-page" class="page active">
+    <div class="page-selector">
+      <select id="page-select">
+        <option value="" disabled selected>Selecione uma página do projeto</option>
       </select>
     </div>
-
-
-    <div class="form-group">
-      <label class="required" for="title">Título</label>
-      <input type="text" id="title" name="title" placeholder="Informe um título descritivo para alteração">
-    </div>
-    
-    <div class="form-group">
-      <label class="required" for="description">Descrição</label>
-      <textarea id="description" name="description" placeholder="Descreva em detalhes o que foi alterado"></textarea>
-    </div>
-    
-    
-    <div class="form-group">
-      <label for="linkLabel">Label do link <span class="optional">(opcional)</span></label>
-      <input type="text" id="linkLabel" name="linkLabel" placeholder="Texto do link (ex: Protótipo)">
-    </div>
-
-    <div class="form-group">
-      <label for="linkUrl">Endereço do link <span class="optional">(opcional)</span></label>
-      <input type="text" id="linkUrl" name="linkUrl" placeholder="http:// ou https://">
-    </div>
-    
-    <div class="form-group">
-      <label for="imageFile">Imagem <span class="optional">(opcional)</span></label>
-      <div class="file-input-container" id="fileInputContainer">
-        <label class="file-input-label">
-         Envie uma imagem do seu computador
-         <div class="image-size-hint">Tamanho recomendado de 600px × 330px</div>
-          <input type="file" id="imageFile" accept="image/*">
-        </label>
-        <div class="file-name" id="fileName"></div>
+    <div class="page-info" id="changelog-status" style="display: none;">
+      <h3>Changelog encontrado!</h3>
+      <p>Esta página já possui um changelog com <span id="entry-count">0</span> registros.</p>
+      <div class="button-container">
+        <button class="button button--secondary" onclick="navigateToChangelog()">Ver Changelog</button>
+        <button class="button button--primary" onclick="navigateToChangelogForm('add')">Adicionar Registro</button>
       </div>
-      <img id="imagePreview" class="image-preview">
-      <button type="button" id="removeImageBtn" style="display: none; margin-top: 10px; background-color: #DC2626; width: auto; padding: 8px 16px;">Remover imagem</button>
+    </div>
+    <div class="page-info" id="no-changelog" style="display: none;">
+      <h3>Nenhum changelog encontrado</h3>
+      <p>Esta página ainda não possui um changelog. Deseja criar um agora?</p>
+      <div class="button-container">
+        <button class="button button--primary" onclick="navigateToChangelogForm('create')">Criar Changelog</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Página do formulário unificado de changelog -->
+  <div id="changelog-form-page" class="page">
+    <h1 id="form-title">Gerenciar Changelog</h1>
+    
+    <div id="successMessage" class="success-message">
+      Operação realizada com sucesso!
     </div>
     
-    <button type="submit" id="submitBtn">Adicionar alteração</button>
-  </form>
+    <div id="errorMessage" class="error-message">
+      Erro ao processar a solicitação. Tente novamente.
+    </div>
+    
+    <form id="changelogForm">
+      <div class="form-group">
+        <label class="required" for="changeType">Classifique sua alteração</label>
+        <select id="changeType" class="minimal" name="changeType">
+          <option value="">Selecione o tipo da alteração</option>
+          <option value="New Feature">Nova Feature</option>
+          <option value="Update">Update</option>
+          <option value="Bug Fix">Bug Fix</option>
+          <option value="Removed">Removido</option>
+          <option value="Refactoring">Refatoração</option>
+          <option value="Improvement">Melhoria</option>
+          <option value="Deprecation">Depreciação</option>
+          <option value="Layout Adjustment">Ajuste de Layout</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="required" for="title">Título</label>
+        <input type="text" id="title" name="title" placeholder="Informe um título descritivo para alteração">
+      </div>
+      
+      <div class="form-group">
+        <label class="required" for="description">Descrição</label>
+        <textarea id="description" name="description" placeholder="Descreva em detalhes o que foi alterado"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="linkLabel">Label do link <span class="optional">(opcional)</span></label>
+        <input type="text" id="linkLabel" name="linkLabel" placeholder="Texto do link (ex: Protótipo)">
+      </div>
+
+      <div class="form-group">
+        <label for="linkUrl">Endereço do link <span class="optional">(opcional)</span></label>
+        <input type="text" id="linkUrl" name="linkUrl" placeholder="http:// ou https://">
+      </div>
+      
+      <div class="form-group">
+        <label for="imageFile">Imagem <span class="optional">(opcional)</span></label>
+        <div class="file-input-container" id="fileInputContainer">
+          <label class="file-input-label">
+           Envie uma imagem do seu computador
+           <div class="image-size-hint">Tamanho recomendado de 600px × 330px</div>
+            <input type="file" id="imageFile" accept="image/*">
+          </label>
+          <div class="file-name" id="fileName"></div>
+        </div>
+        <img id="imagePreview" class="image-preview">
+        <button type="button" id="removeImageBtn" style="display: none; margin-top: 10px; background-color: #DC2626; width: auto; padding: 8px 16px;">Remover imagem</button>
+      </div>
+      
+      <div class="button-container" style="margin-top: 20px;">
+        <button type="button" id="cancelBtn" onclick="navigateToPage('home-page')" style="background-color: #444444;">Cancelar</button>
+        <button type="submit" id="submitBtn">Adicionar</button>
+      </div>
+    </form>
+  </div>
 
   <script>
+    // Estado global do plugin
+    const pluginState = {
+        selectedPage: null,
+        hasChangelog: false,
+        entryCount: 0,
+        formMode: 'create' // 'create' para criar novo changelog, 'add' para adicionar entrada
+    };
+
+    // Função para mostrar mensagem de erro
+    function showError(message) {
+        console.error('Erro:', message);
+        
+        // Criar elemento de erro
+        const errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        errorElement.style.display = 'block';
+        errorElement.style.position = 'fixed';
+        errorElement.style.top = '10px';
+        errorElement.style.left = '50%';
+        errorElement.style.transform = 'translateX(-50%)';
+        errorElement.style.zIndex = '1000';
+        errorElement.style.width = '90%';
+        errorElement.style.maxWidth = '400px';
+        errorElement.style.padding = '12px';
+        errorElement.style.borderRadius = '4px';
+        errorElement.style.background = '#FEE2E2';
+        errorElement.style.color = '#DC2626';
+        errorElement.style.fontSize = '14px';
+        errorElement.style.textAlign = 'center';
+        errorElement.textContent = message;
+        
+        // Adicionar ao topo da tela
+        document.body.appendChild(errorElement);
+        
+        // Remover após 5 segundos
+        setTimeout(() => {
+            errorElement.remove();
+        }, 5000);
+    }
+
+    // Função para atualizar a lista de páginas
+    function updatePageList(pages) {
+        const select = document.getElementById('page-select');
+        select.innerHTML = '<option value="" disabled selected>Selecione uma página do projeto</option>';
+        
+        if (!pages || pages.length === 0) {
+            showError('Nenhuma página encontrada no projeto');
+            return;
+        }
+        
+        pages.forEach(page => {
+            const option = document.createElement('option');
+            option.value = page.id;
+            option.textContent = page.name;
+            select.appendChild(option);
+        });
+    }
+
+    // Função para mostrar status do changelog
+    function updateChangelogStatus(hasChangelog, entryCount = 0) {
+        const statusDiv = document.getElementById('changelog-status');
+        const noChangelogDiv = document.getElementById('no-changelog');
+        
+        if (hasChangelog) {
+            document.getElementById('entry-count').textContent = entryCount;
+            statusDiv.style.display = 'block';
+            noChangelogDiv.style.display = 'none';
+        } else {
+            statusDiv.style.display = 'none';
+            noChangelogDiv.style.display = 'block';
+        }
+    }
+
+    // Funções de navegação
+    function navigateToPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    function navigateToChangelog() {
+        parent.postMessage({ pluginMessage: { type: 'navigate-to-changelog' } }, '*');
+    }
+
+    function navigateToChangelogForm(mode) {
+        // Definir o modo do formulário
+        pluginState.formMode = mode;
+        
+        // Atualizar o título e o botão de acordo com o modo
+        if (mode === 'create') {
+            document.getElementById('form-title').textContent = 'Criar novo Changelog';
+            document.getElementById('submitBtn').textContent = 'Criar Changelog';
+        } else {
+            document.getElementById('form-title').textContent = 'Adicionar nova entrada ao Changelog';
+            document.getElementById('submitBtn').textContent = 'Adicionar Entrada';
+        }
+        
+        // Limpar o formulário
+        document.getElementById('changelogForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('fileName').textContent = '';
+        document.getElementById('fileInputContainer').style.display = 'block';
+        document.getElementById('removeImageBtn').style.display = 'none';
+        
+        // Limpar mensagens
+        document.getElementById('successMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+        
+        // Limpar mensagens de erro anteriores
+        document.querySelectorAll('.validation-error').forEach(el => el.remove());
+        
+        // Navegar para a página do formulário
+        navigateToPage('changelog-form-page');
+    }
+
+    // Função para mostrar estado de carregamento
+    function showLoading() {
+        // Mostrar indicador de carregamento
+        const select = document.getElementById('page-select');
+        select.disabled = true;
+        select.parentElement.classList.add('loading');
+        
+        // Ocultar status anterior
+        document.getElementById('changelog-status').style.display = 'none';
+        document.getElementById('no-changelog').style.display = 'none';
+        
+        // Adicionar spinner
+        const spinner = document.createElement('div');
+        spinner.id = 'loading-spinner';
+        spinner.className = 'spinner';
+        document.getElementById('home-page').appendChild(spinner);
+    }
+    
+    // Função para esconder estado de carregamento
+    function hideLoading() {
+        // Reativar o select
+        const select = document.getElementById('page-select');
+        select.disabled = false;
+        select.parentElement.classList.remove('loading');
+        
+        // Remover spinner se existir
+        const spinner = document.getElementById('loading-spinner');
+        if (spinner) spinner.remove();
+    }
+
+    // Event listeners
+    document.getElementById('page-select').addEventListener('change', (e) => {
+        const pageId = e.target.value;
+        if (!pageId) return;
+        
+        pluginState.selectedPage = pageId;
+        console.log(`Página selecionada: ${pageId}`);
+        
+        // Mostrar estado de carregamento
+        showLoading();
+        
+        // Enviar mensagem para verificar o changelog
+        parent.postMessage({ pluginMessage: { type: 'check-changelog', pageId } }, '*');
+    });
+
+    // Função para processar sucesso da operação
+    function onFormSuccess() {
+        // Exibir mensagem de sucesso
+        document.getElementById('successMessage').style.display = 'block';
+        
+        // Voltar para a página inicial após 1,5 segundos
+        setTimeout(() => {
+            document.getElementById('successMessage').style.display = 'none';
+            navigateToPage('home-page');
+            
+            // Limpar formulário
+            document.getElementById('changelogForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('fileInputContainer').style.display = 'block';
+            document.getElementById('removeImageBtn').style.display = 'none';
+        }, 1500);
+    }
+
+    // Função para atualizar o estado do plugin
+    function updatePluginState(hasChangelog, entryCount, currentPageId) {
+        console.log(`Atualizando estado do plugin: hasChangelog=${hasChangelog}, entryCount=${entryCount}, pageId=${currentPageId}`);
+        
+        // Atualizar o estado global
+        pluginState.hasChangelog = hasChangelog;
+        pluginState.entryCount = entryCount;
+        
+        // Se temos um ID de página, atualizar a seleção do dropdown
+        if (currentPageId) {
+            // Verificar se o ID da página já está selecionado
+            if (document.getElementById('page-select').value !== currentPageId) {
+                document.getElementById('page-select').value = currentPageId;
+            }
+        }
+        
+        // Atualizar a interface com o estado atual
+        updateChangelogStatus(hasChangelog, entryCount);
+    }
+
+    // Receber mensagens do plugin - principal handler
+    window.onmessage = function(event) {
+        const message = event.data.pluginMessage;
+        if (!message) return;
+        
+        console.log("Mensagem recebida do plugin:", message.type);
+        
+        // Esconder estado de carregamento
+        hideLoading();
+        
+        // Mensagens relacionadas à navegação
+        if (message.type === 'update-pages') {
+            console.log('Atualizando lista de páginas:', message.pages.length);
+            updatePageList(message.pages);
+        } 
+        else if (message.type === 'changelog-status') {
+            console.log('Atualizando status do changelog:', message.hasChangelog);
+            updatePluginState(message.hasChangelog, message.entryCount || 0, message.currentPageId);
+        } 
+        else if (message.type === 'navigate-to-home') {
+            console.log('Redirecionando para a página inicial');
+            
+            // Atualizar estado se houver informações sobre a página atual
+            if (message.hasChangelog !== undefined && message.entryCount !== undefined) {
+                console.log('Atualizando estado antes de redirecionar');
+                updatePluginState(message.hasChangelog, message.entryCount, message.currentPageId);
+            }
+            
+            // Navegar para a página inicial
+            navigateToPage('home-page');
+        }
+        else if (message.type === 'error') {
+            console.error('Erro recebido do plugin:', message.message);
+            
+            // Exibir erro na página ativa atual
+            if (document.getElementById('changelog-form-page').classList.contains('active')) {
+                document.getElementById('errorMessage').textContent = message.message || 'Ocorreu um erro desconhecido';
+                document.getElementById('errorMessage').style.display = 'block';
+            } 
+            else {
+                // Se não estiver em uma página específica, mostrar como erro flutuante
+                showError(message.message || 'Ocorreu um erro desconhecido');
+            }
+        }
+        
+        // Processar resposta com informações do usuário
+        else if (message.type === 'user-info') {
+            console.log('Recebidas informações do usuário');
+            if (message.photoUrl) {
+                // Se temos uma URL de foto, tente processá-la
+                parent.postMessage({ 
+                    pluginMessage: { 
+                        type: 'process-user-image', 
+                        photoUrl: message.photoUrl 
+                    } 
+                }, '*');
+            } else if (window.currentImageCallback) {
+                // Se não temos URL, responda o callback com null
+                window.currentImageCallback(null);
+                delete window.currentImageCallback;
+            }
+        }
+        
+        // Lidar com bytes da imagem que o plugin processou
+        else if (message.type === 'user-image-bytes') {
+            try {
+                console.log('Recebidos bytes de imagem do plugin, convertendo para base64');
+                // Converter array de bytes para Uint8Array
+                const imageBytes = new Uint8Array(message.imageBytes);
+                
+                // Criar um Blob a partir dos bytes
+                const blob = new Blob([imageBytes], { type: `image/${message.format.toLowerCase()}` });
+                
+                // Converter Blob para base64
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const base64data = reader.result;
+                    console.log('Bytes de imagem convertidos para base64 com sucesso');
+                    
+                    // Se isso estiver em um processamento pendente, continuar
+                    if (window.currentImageCallback) {
+                        window.currentImageCallback(base64data);
+                        delete window.currentImageCallback;
+                    }
+                };
+                
+                reader.onerror = function(error) {
+                    console.error('Erro ao converter bytes para base64:', error);
+                    if (window.currentImageCallback) {
+                        window.currentImageCallback(null);
+                        delete window.currentImageCallback;
+                    }
+                };
+                
+                reader.readAsDataURL(blob);
+            } catch (error) {
+                console.error('Erro ao processar bytes da imagem:', error);
+                if (window.currentImageCallback) {
+                    window.currentImageCallback(null);
+                    delete window.currentImageCallback;
+                }
+            }
+        }
+        
+        // Responder diretamente com imagem processada
+        else if (message.type === 'user-image-processed' && window.currentImageCallback) {
+            console.log('Recebida imagem já processada do plugin');
+            window.currentImageCallback(message.imageData);
+            delete window.currentImageCallback;
+        }
+        
+        // Erro no processamento da imagem
+        else if (message.type === 'user-image-error' && window.currentImageCallback) {
+            console.error('Erro no processamento da imagem:', message.error);
+            window.currentImageCallback(null);
+            delete window.currentImageCallback;
+        }
+        
+        // Restaurar o botão para o estado normal
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.textContent = pluginState.formMode === 'create' ? 'Criar Changelog' : 'Adicionar Entrada';
+            submitBtn.disabled = false;
+        }
+        
+        if (message.type === 'success') {
+            // Atualizar estado se houver informações sobre a página atual
+            if (message.hasChangelog !== undefined && message.entryCount !== undefined) {
+                console.log('Atualizando estado após operação bem-sucedida');
+                updatePluginState(message.hasChangelog, message.entryCount, message.currentPageId);
+            }
+            
+            // Verificar se estamos na página do formulário
+            if (document.getElementById('changelog-form-page').classList.contains('active')) {
+                onFormSuccess();
+            }
+        }
+    };
+
+    // Solicitar lista de páginas ao carregar
+    console.log("Solicitando lista de páginas...");
+    setTimeout(() => {
+        parent.postMessage({ pluginMessage: { type: 'get-pages' } }, '*');
+    }, 500);
+
     // Preview da imagem selecionada
     document.getElementById('imageFile').addEventListener('change', function(event) {
       const file = event.target.files[0];
@@ -451,7 +930,7 @@
       }, 3000);
     }
 
-    // Formulário de envio
+    // Formulário de envio unificado
     document.getElementById('changelogForm').addEventListener('submit', async function(event) {
       event.preventDefault();
       const form = this;
@@ -537,10 +1016,17 @@
           });
         });
         
+        // Determinar o tipo de mensagem com base no modo do formulário
+        const messageType = pluginState.formMode === 'create' 
+          ? 'create-changelog' 
+          : 'add-changelog-entry';
+          
+        console.log(`Enviando dados do formulário com o tipo: ${messageType}`);
+        
         // Enviar dados para o plugin
         parent.postMessage({ 
           pluginMessage: { 
-            type: 'submit-form', 
+            type: messageType, 
             data: data 
           } 
         }, '*');
@@ -554,114 +1040,6 @@
         submitBtn.textContent = originalBtnText;
       }
     });
-
-    // Receber mensagens do código principal
-    window.onmessage = (event) => {
-      const message = event.data.pluginMessage;
-      if (message) {
-        console.log("Mensagem recebida do plugin:", message.type);
-        
-        // Processar resposta com informações do usuário
-        if (message.type === 'user-info') {
-          console.log('Recebidas informações do usuário');
-          if (message.photoUrl) {
-            // Se temos uma URL de foto, tente processá-la
-            parent.postMessage({ 
-              pluginMessage: { 
-                type: 'process-user-image', 
-                photoUrl: message.photoUrl 
-              } 
-            }, '*');
-          } else if (window.currentImageCallback) {
-            // Se não temos URL, responda o callback com null
-            window.currentImageCallback(null);
-            delete window.currentImageCallback;
-          }
-        }
-        
-        // Lidar com bytes da imagem que o plugin processou
-        else if (message.type === 'user-image-bytes') {
-          try {
-            console.log('Recebidos bytes de imagem do plugin, convertendo para base64');
-            // Converter array de bytes para Uint8Array
-            const imageBytes = new Uint8Array(message.imageBytes);
-            
-            // Criar um Blob a partir dos bytes
-            const blob = new Blob([imageBytes], { type: `image/${message.format.toLowerCase()}` });
-            
-            // Converter Blob para base64
-            const reader = new FileReader();
-            reader.onload = function() {
-              const base64data = reader.result;
-              console.log('Bytes de imagem convertidos para base64 com sucesso');
-              
-              // Se isso estiver em um processamento pendente, continuar
-              if (window.currentImageCallback) {
-                window.currentImageCallback(base64data);
-                delete window.currentImageCallback;
-              }
-            };
-            
-            reader.onerror = function(error) {
-              console.error('Erro ao converter bytes para base64:', error);
-              if (window.currentImageCallback) {
-                window.currentImageCallback(null);
-                delete window.currentImageCallback;
-              }
-            };
-            
-            reader.readAsDataURL(blob);
-          } catch (error) {
-            console.error('Erro ao processar bytes da imagem:', error);
-            if (window.currentImageCallback) {
-              window.currentImageCallback(null);
-              delete window.currentImageCallback;
-            }
-          }
-        }
-        
-        // Responder diretamente com imagem processada
-        else if (message.type === 'user-image-processed' && window.currentImageCallback) {
-          console.log('Recebida imagem já processada do plugin');
-          window.currentImageCallback(message.imageData);
-          delete window.currentImageCallback;
-        }
-        
-        // Erro no processamento da imagem
-        else if (message.type === 'user-image-error' && window.currentImageCallback) {
-          console.error('Erro no processamento da imagem:', message.error);
-          window.currentImageCallback(null);
-          delete window.currentImageCallback;
-        }
-        
-        // Restaurar o botão para o estado normal
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.textContent = 'Adicionar alteração';
-        submitBtn.disabled = false;
-        
-        if (message.type === 'success') {
-          document.getElementById('successMessage').style.display = 'block';
-          
-          // Limpar formulário após submissão bem-sucedida
-          document.getElementById('title').value = '';
-          document.getElementById('description').value = '';
-          document.getElementById('changeType').value = '';
-          document.getElementById('linkUrl').value = '';
-          document.getElementById('linkLabel').value = '';
-          document.getElementById('imageFile').value = '';
-          document.getElementById('imagePreview').style.display = 'none';
-          document.getElementById('fileName').textContent = '';
-          
-          // Esconder a mensagem de sucesso após 3 segundos
-          setTimeout(() => {
-            document.getElementById('successMessage').style.display = 'none';
-          }, 3000);
-        } else if (message.type === 'error') {
-          document.getElementById('errorMessage').textContent = message.message || 'Ocorreu um erro ao processar sua solicitação.';
-          document.getElementById('errorMessage').style.display = 'block';
-        }
-      }
-    };
   </script>
 </body>
 </html> 
