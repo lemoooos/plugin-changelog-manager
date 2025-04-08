@@ -136,6 +136,13 @@
       margin-top: var(--spacing-md);
       transition: background-color 0.2s ease;
     }
+
+    .button--secondary {
+      background: #444444;
+      &:hover {
+       background: #535353;
+      }
+    }
     
     button:hover {
       background: var(--color-button-hover);
@@ -165,35 +172,34 @@
     .file-input-container {
       position: relative;
       margin-top: var(--spacing-sm);
+      overflow: hidden;
+      width: 100%;
+      height: 120px;
+      cursor: pointer;
     }
     
     .file-input-label {
-      display: inline-block;
-      background: var(--color-background);
-      padding: 8px 16px;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-size: 14px;
-      border: 1px solid var(--color-tertiary);
-      color: var(--color-text);
-      transition: background-color 0.2s ease;
-
-      border: 1px;
-      border-style: dashed;
-      border-color: var(--color-secondary);
-      width: 100%;
-      text-align: center;
-      height: 120px;
       display: flex;
-      flex-wrap: wrap;
-      align-content: center;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
+      background: var(--color-background);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      border: 1px dashed var(--color-secondary);
       color: white;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 5;
+      pointer-events: none;
     }
     
     .file-input-label:hover {
-      /* background: #EFEFEF; */
+      background-color: rgba(255, 255, 255, 0.05);
     }
     
     #imageFile {
@@ -204,6 +210,7 @@
       width: 100%;
       height: 100%;
       cursor: pointer;
+      z-index: 10;
     }
     
     .file-name {
@@ -300,7 +307,7 @@
         width: 100%;
         padding: 16px;
         background-color: var(--color-background);
-        border-bottom: 1px solid var(--color-border);
+        /* border-bottom: 1px solid var(--color-border); */
     }
     
     .page-selector select {
@@ -471,11 +478,11 @@
       <div class="form-group">
         <label for="imageFile">Imagem <span class="optional">(opcional)</span></label>
         <div class="file-input-container" id="fileInputContainer">
-          <label class="file-input-label">
+          <label class="file-input-label" for="imageFile">
            Envie uma imagem do seu computador
            <div class="image-size-hint">Tamanho recomendado de 600px × 330px</div>
-            <input type="file" id="imageFile" accept="image/*">
           </label>
+          <input type="file" id="imageFile" accept="image/*">
           <div class="file-name" id="fileName"></div>
         </div>
         <img id="imagePreview" class="image-preview">
@@ -836,9 +843,18 @@
     }, 500);
 
     // Preview da imagem selecionada
-    document.getElementById('imageFile').addEventListener('change', function(event) {
+    const imageFileInput = document.getElementById('imageFile');
+    
+    // Adicionar log quando o input for clicado
+    imageFileInput.addEventListener('click', function() {
+      console.log('Input de arquivo clicado');
+    });
+    
+    imageFileInput.addEventListener('change', function(event) {
+      console.log('Evento change acionado no input de arquivo');
       const file = event.target.files[0];
       if (file) {
+        console.log('Arquivo selecionado:', file.name);
         const reader = new FileReader();
         reader.onload = function(e) {
           const preview = document.getElementById('imagePreview');
@@ -851,6 +867,8 @@
           document.getElementById('removeImageBtn').style.display = 'inline-block';
         };
         reader.readAsDataURL(file);
+      } else {
+        console.log('Nenhum arquivo selecionado');
       }
     });
 
@@ -865,6 +883,13 @@
       // Ocultar o botão de remover e mostrar o de escolher imagem novamente
       this.style.display = 'none';
       document.getElementById('fileInputContainer').style.display = 'block';
+    });
+
+    // Adicionar evento de clique no container como backup
+    document.getElementById('fileInputContainer').addEventListener('click', function() {
+      console.log('Container de arquivo clicado');
+      // Simular clique no input de arquivo
+      imageFileInput.click();
     });
 
     // Função para mostrar erro de validação
