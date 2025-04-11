@@ -138,7 +138,7 @@
     }
 
     .button--secondary {
-      background: #444444;
+      background: #444444 !important;
       &:hover {
        background: #535353;
       }
@@ -154,7 +154,7 @@
     }
     
     .optional {
-      color: var(--color-hint);
+      color: var(--color-hint) !important;
       font-weight: normal;
       font-size: 12px;
       margin-left: 4px;
@@ -172,10 +172,13 @@
     .file-input-container {
       position: relative;
       margin-top: var(--spacing-sm);
-      overflow: hidden;
       width: 100%;
       height: 120px;
       cursor: pointer;
+      background: var(--color-background);
+      border-radius: var(--border-radius);
+      border: 1px dashed var(--color-secondary);
+      overflow: hidden;
     }
     
     .file-input-label {
@@ -183,34 +186,45 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: var(--color-background);
-      border-radius: var(--border-radius);
-      font-size: 14px;
-      border: 1px dashed var(--color-secondary);
-      color: white;
       width: 100%;
       height: 100%;
       text-align: center;
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 5;
-      pointer-events: none;
     }
-    
-    .file-input-label:hover {
+
+    #uploadImageBtn {
+        background-color: var(--color-button);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 8px 16px;
+        font-weight: 500;
+        font-size: 13px;
+        cursor: pointer;
+        margin-bottom: var(--spacing-sm);
+        width: auto;
+        margin-top: 0;
+    }
+
+    #uploadImageBtn:hover {
+        background-color: var(--color-button-hover);
+    }
+
+    .file-input-container:hover {
       background-color: rgba(255, 255, 255, 0.05);
     }
-    
+
     #imageFile {
-      position: absolute;
-      left: 0;
-      top: 0;
       opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-      z-index: 10;
+      width: 1px;
+      height: 1px;
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      z-index: -1;
+      pointer-events: none;
     }
     
     .file-name {
@@ -406,13 +420,14 @@
   <!-- Página inicial com seletor de páginas -->
   <div id="home-page" class="page active">
     <div class="page-selector">
+      <label>Selecione uma página do projeto</label>
       <select id="page-select">
-        <option value="" disabled selected>Selecione uma página do projeto</option>
+        <option value="" disabled selected>Nenhuma página selecionada</option>
       </select>
     </div>
     <div class="page-info" id="changelog-status" style="display: none;">
       <h3>Changelog encontrado!</h3>
-      <p>Esta página já possui um changelog com <span id="entry-count">0</span> registros.</p>
+      <p class="optional">Esta página já possui um changelog com <span id="entry-count">0</span> registro(s).</p>
       <div class="button-container">
         <button class="button button--secondary" onclick="navigateToChangelog()">Ver Changelog</button>
         <button class="button button--primary" onclick="navigateToChangelogForm('add')">Adicionar Registro</button>
@@ -420,7 +435,7 @@
     </div>
     <div class="page-info" id="no-changelog" style="display: none;">
       <h3>Nenhum changelog encontrado</h3>
-      <p>Esta página ainda não possui um changelog. Deseja criar um agora?</p>
+      <p class="optional">Esta página ainda não possui um changelog. Deseja criar um agora?</p>
       <div class="button-container">
         <button class="button button--primary" onclick="navigateToChangelogForm('create')">Criar Changelog</button>
       </div>
@@ -479,8 +494,8 @@
         <label for="imageFile">Imagem <span class="optional">(opcional)</span></label>
         <div class="file-input-container" id="fileInputContainer">
           <label class="file-input-label" for="imageFile">
-           Envie uma imagem do seu computador
-           <div class="image-size-hint">Tamanho recomendado de 600px × 330px</div>
+            <button class="button button--secondary" type="button" id="uploadImageBtn">Enviar Imagem</button>
+            <div class="image-size-hint">Tamanho recomendado de 600px × 330px</div>
           </label>
           <input type="file" id="imageFile" accept="image/*">
           <div class="file-name" id="fileName"></div>
@@ -540,7 +555,7 @@
     // Função para atualizar a lista de páginas
     function updatePageList(pages) {
         const select = document.getElementById('page-select');
-        select.innerHTML = '<option value="" disabled selected>Selecione uma página do projeto</option>';
+        select.innerHTML = '<option value="" disabled selected>Nenhuma página selecionada</option>';
         
         if (!pages || pages.length === 0) {
             showError('Nenhuma página encontrada no projeto');
@@ -591,8 +606,8 @@
             document.getElementById('form-title').textContent = 'Criar novo Changelog';
             document.getElementById('submitBtn').textContent = 'Criar Changelog';
         } else {
-            document.getElementById('form-title').textContent = 'Adicionar nova entrada ao Changelog';
-            document.getElementById('submitBtn').textContent = 'Adicionar Entrada';
+            document.getElementById('form-title').textContent = 'Adicionar nova alteração';
+            document.getElementById('submitBtn').textContent = 'Adicionar Alteração';
         }
         
         // Limpar o formulário
@@ -842,55 +857,75 @@
         parent.postMessage({ pluginMessage: { type: 'get-pages' } }, '*');
     }, 500);
 
-    // Preview da imagem selecionada
-    const imageFileInput = document.getElementById('imageFile');
-    
-    // Adicionar log quando o input for clicado
-    imageFileInput.addEventListener('click', function() {
-      console.log('Input de arquivo clicado');
-    });
-    
-    imageFileInput.addEventListener('change', function(event) {
-      console.log('Evento change acionado no input de arquivo');
-      const file = event.target.files[0];
-      if (file) {
-        console.log('Arquivo selecionado:', file.name);
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const preview = document.getElementById('imagePreview');
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-          document.getElementById('fileName').textContent = file.name;
-          
-          // Ocultar o botão de escolher imagem e mostrar o botão de remover
-          document.getElementById('fileInputContainer').style.display = 'none';
-          document.getElementById('removeImageBtn').style.display = 'inline-block';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        console.log('Nenhum arquivo selecionado');
-      }
-    });
+    // ======== BEGIN: UPLOAD DE IMAGENS (Abordagem Botão Dedicado) ========
+    // Garantir que esta inicialização ocorra apenas uma vez
+    if (!window.uiImageUploadInitialized) {
+        window.uiImageUploadInitialized = true; // Marcar como inicializado
+        
+        console.log('Inicializando listeners de upload de imagem com Botão (única vez)');
 
-    // Adicionar evento para o botão remover imagem
-    document.getElementById('removeImageBtn').addEventListener('click', function() {
-      // Limpar a imagem
-      document.getElementById('imageFile').value = '';
-      document.getElementById('imagePreview').src = '';
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('fileName').textContent = '';
-      
-      // Ocultar o botão de remover e mostrar o de escolher imagem novamente
-      this.style.display = 'none';
-      document.getElementById('fileInputContainer').style.display = 'block';
-    });
-
-    // Adicionar evento de clique no container como backup
-    document.getElementById('fileInputContainer').addEventListener('click', function() {
-      console.log('Container de arquivo clicado');
-      // Simular clique no input de arquivo
-      imageFileInput.click();
-    });
+        const fileInputContainer = document.getElementById('fileInputContainer');
+        const imageFileInput = document.getElementById('imageFile');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+        const uploadImageBtn = document.getElementById('uploadImageBtn'); // Novo botão
+        
+        // Limpar listeners antigos (precaução)
+        if (fileInputContainer) fileInputContainer.onclick = null; // Remover listener do container
+        if (uploadImageBtn) uploadImageBtn.onclick = null;
+        if (imageFileInput) imageFileInput.onchange = null;
+        if (removeImageBtn) removeImageBtn.onclick = null;
+        
+        // Evento de clique no NOVO BOTÃO de upload
+        if (uploadImageBtn && imageFileInput) {
+            uploadImageBtn.onclick = function(event) {
+                console.log('Botão Enviar Imagem clicado');
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation(); // Importante para não acionar outros cliques
+                }
+                imageFileInput.click(); // Aciona o input escondido
+            };
+        } else {
+            console.error('Botão de upload ou input de arquivo não encontrado.');
+        }
+        
+        // Evento change do input (continua igual)
+        if (imageFileInput) {
+            imageFileInput.onchange = function() {
+                console.log('Input de arquivo: evento change (button approach)');
+                const file = this.files[0];
+                if (file) {
+                    console.log('Arquivo selecionado:', file.name);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('imagePreview');
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        document.getElementById('fileName').textContent = file.name;
+                        
+                        if (fileInputContainer) fileInputContainer.style.display = 'none';
+                        if (removeImageBtn) removeImageBtn.style.display = 'inline-block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+        }
+        
+        // Evento click do botão remover (continua igual)
+        if (removeImageBtn && imageFileInput && fileInputContainer) {
+            removeImageBtn.onclick = function() {
+                console.log('Botão remover: clicado (button approach)');
+                imageFileInput.value = ''; // Limpa o input
+                document.getElementById('imagePreview').src = '';
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('fileName').textContent = '';
+                
+                this.style.display = 'none';
+                fileInputContainer.style.display = 'block';
+            };
+        }
+    }
+    // ======== END: UPLOAD DE IMAGENS (Abordagem Botão Dedicado) ========
 
     // Função para mostrar erro de validação
     function showValidationError(inputElement, message) {
